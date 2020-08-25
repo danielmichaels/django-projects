@@ -1,3 +1,4 @@
+from django.forms import inlineformset_factory
 from django.shortcuts import render, redirect
 
 from .forms import OrderForm
@@ -37,19 +38,29 @@ def customers(request, pk):
     return render(request, template_name="accounts/customer.html", context=context)
 
 
-def create_order(request):
+def create_order(request, pk):
     """
     In this example we do create on a ModelForm which we can
     call .save() on as it maps to the model is sync'd with.
     """
+    customer = Customer.objects.get(id=pk)
+    OrderedFormSet = inlineformset_factory(
+        Customer,
+        Order,
+        fields=("product", "status"),
+        extra=6,  # dictates how many fields to render
+    )
     if request.method == "POST":
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            form.save()
+        formset = OrderedFormSet(request.POST, instance=customer)
+        if formset.is_valid():
+            formset.save()
             return redirect("home")
     else:
-        form = OrderForm()
-    context = {"form": form}
+        formset = OrderedFormSet(
+            queryset=Order.objects.none(), instance=customer  # qs none() return none
+        )  # return customer objects
+    #     form = OrderForm(initial={"customer": customer})
+    context = {"formset": formset}
 
     return render(request, context=context, template_name="accounts/order_form.html")
 
