@@ -1,15 +1,18 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
 from django.forms import inlineformset_factory
 from django.shortcuts import render, redirect
 
+from .decorators import unauthenticated_user, allowed_user, admin_only
 from .filters import OrderFilter
 from .forms import OrderForm, CreateUserForm
 from .models import Product, Order, Customer
 
 
-@login_required(login_url='login')
+@login_required(login_url="login")
+@admin_only
 def home(request):
     orders = Order.objects.all()
     customers = Customer.objects.all()
@@ -28,7 +31,8 @@ def home(request):
     return render(request, context=context, template_name="accounts/dashboard.html")
 
 
-@login_required(login_url='login')
+@login_required(login_url="login")
+@allowed_user(allowed_roles=["admin"])
 def products(request):
     products = Product.objects.all()
     return render(
@@ -36,7 +40,8 @@ def products(request):
     )
 
 
-@login_required(login_url='login')
+@login_required(login_url="login")
+@allowed_user(allowed_roles=["admin"])
 def customers(request, pk):
     customer = Customer.objects.get(id=pk)
     orders = customer.order_set.all()
@@ -54,7 +59,8 @@ def customers(request, pk):
     return render(request, template_name="accounts/customer.html", context=context)
 
 
-@login_required(login_url='login')
+@login_required(login_url="login")
+@allowed_user(allowed_roles=["admin"])
 def create_order(request, pk):
     """
     In this example we do create on a ModelForm which we can
@@ -82,7 +88,8 @@ def create_order(request, pk):
     return render(request, context=context, template_name="accounts/order_form.html")
 
 
-@login_required(login_url='login')
+@login_required(login_url="login")
+@allowed_user(allowed_roles=["admin"])
 def update_order(request, pk):
     """
     Updates to an object are done by accessing the objects id via the
@@ -101,7 +108,8 @@ def update_order(request, pk):
     return render(request, context=context, template_name="accounts/order_form.html")
 
 
-@login_required(login_url='login')
+@login_required(login_url="login")
+@allowed_user(allowed_roles=["admin"])
 def delete_order(request, pk):
     """
     To delete an item using a form we again pass in the pk to retrieve it
@@ -117,13 +125,15 @@ def delete_order(request, pk):
     return render(request, "accounts/delete.html", context=context)
 
 
+@unauthenticated_user
 def register(request):
-    if request.user.is_authenticated:
-        return redirect('home')
     if request.method == "POST":
         form = CreateUserForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+
+            group = Group.objects.get(name='customer')
+            user.groups.add(group)
             messages.success(
                 request, f"Success! Please Login as {form.cleaned_data.get('username')}"
             )
@@ -134,24 +144,28 @@ def register(request):
     context = {"form": form}
     return render(request, "accounts/register.html", context)
 
-
+@unauthenticated_user
 def login_(request):
-    if request.user.is_authenticated:
-        return redirect('home')
     if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.POST.get("username")
+        password = request.POST.get("password")
         user = authenticate(request, username=username, password=password)
 
         if user:
             login(request, user)
-            return redirect('home')
+            return redirect("home")
         else:
             messages.error(request, "could not authenticate user")
     context = {}
     return render(request, "accounts/login.html", context)
 
-@login_required(login_url='login')
+
+@login_required(login_url="login")
 def logout_(request):
     logout(request)
-    return redirect('home')
+    return redirect("home")
+
+@allowed_user(allowed_roles=["customer"])
+def user(request):
+    context = {}
+    return render(request, 'accounts/user.html', context)
