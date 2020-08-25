@@ -1,6 +1,7 @@
 from django.forms import inlineformset_factory
 from django.shortcuts import render, redirect
 
+from .filters import OrderFilter
 from .forms import OrderForm
 from .models import Product, Order, Customer
 
@@ -34,7 +35,16 @@ def customers(request, pk):
     customer = Customer.objects.get(id=pk)
     orders = customer.order_set.all()
     order_count = orders.count()
-    context = {"customer": customer, "orders": orders, "order_count": order_count}
+
+    # filters are really powerful this allows us to create a very quick 'search'
+    myFilter = OrderFilter(request.GET, queryset=orders)
+    orders = myFilter.qs
+    context = {
+        "customer": customer,
+        "orders": orders,
+        "order_count": order_count,
+        "myFilter": myFilter,
+    }
     return render(request, template_name="accounts/customer.html", context=context)
 
 

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     # internal apps
     "accounts",
     # third-party apps
+    "django_filters",
 ]
 
 MIDDLEWARE = [
