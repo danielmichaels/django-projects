@@ -5,6 +5,7 @@ class Customer(models.Model):
     """
     Customer
     """
+
     # Have to register models in the admin.py file as well
     name = models.CharField(max_length=255, null=True)
     phone = models.CharField(max_length=255, null=True)
@@ -14,6 +15,7 @@ class Customer(models.Model):
     def __str__(self):
         # in admin, if we don't declare this we just get a Customer object
         return self.name
+
 
 class Tag(models.Model):
     """
@@ -62,4 +64,5 @@ class Order(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.status
+        # Here we can return the parent attribute of `name`
+        return self.product.name

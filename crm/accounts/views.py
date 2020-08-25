@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
+from .forms import OrderForm
 from .models import Product, Order, Customer
 
 
@@ -8,34 +9,79 @@ def home(request):
     customers = Customer.objects.all()
     total_customers = customers.count()
     total_orders = orders.count()
-    pending_orders = orders.filter(status='Pending').count()
-    delivered_orders = orders.filter(status='Delivered').count()
+    pending_orders = orders.filter(status="Pending").count()
+    delivered_orders = orders.filter(status="Delivered").count()
     context = {
-        'orders': orders,
-        'customers': customers,
-        'total_orders': total_orders,
-        'total_customers': total_customers,
-        'pending_orders': pending_orders,
-        'delivered_orders': delivered_orders,
+        "orders": orders,
+        "customers": customers,
+        "total_orders": total_orders,
+        "total_customers": total_customers,
+        "pending_orders": pending_orders,
+        "delivered_orders": delivered_orders,
     }
-    return render(request, context=context,
-                  template_name="accounts/dashboard.html")
+    return render(request, context=context, template_name="accounts/dashboard.html")
 
 
 def products(request):
     products = Product.objects.all()
-    return render(request, template_name="accounts/products.html", context={
-        'products': products,
-    })
+    return render(
+        request, template_name="accounts/products.html", context={"products": products,}
+    )
 
 
 def customers(request, pk):
     customer = Customer.objects.get(id=pk)
     orders = customer.order_set.all()
     order_count = orders.count()
-    context = {
-        'customer': customer,
-        'orders': orders,
-        'order_count': order_count
-    }
+    context = {"customer": customer, "orders": orders, "order_count": order_count}
     return render(request, template_name="accounts/customer.html", context=context)
+
+
+def create_order(request):
+    """
+    In this example we do create on a ModelForm which we can
+    call .save() on as it maps to the model is sync'd with.
+    """
+    if request.method == "POST":
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("home")
+    else:
+        form = OrderForm()
+    context = {"form": form}
+
+    return render(request, context=context, template_name="accounts/order_form.html")
+
+
+def update_order(request, pk):
+    """
+    Updates to an object are done by accessing the objects id via the
+    pk variable and then setting the form to map its values against
+    that id with `instance=order`.
+    """
+    order = Order.objects.get(id=pk)
+    if request.method == "POST":
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("home")
+    else:
+        form = OrderForm(instance=order)
+    context = {"form": form}
+    return render(request, context=context, template_name="accounts/order_form.html")
+
+
+def delete_order(request, pk):
+    """
+    To delete an item using a form we again pass in the pk to retrieve it
+    via the ORM. This gives access to the delete method on the object.
+    In the form html, we reference the item and its attributes for user
+    view port.
+    """
+    item = Order.objects.get(id=pk)
+    if request.method == "POST":
+        item.delete()
+        return redirect("home")
+    context = {"item": item}
+    return render(request, "accounts/delete.html", context=context)
