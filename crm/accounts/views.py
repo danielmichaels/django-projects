@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Group
 from django.forms import inlineformset_factory
 from django.shortcuts import render, redirect
 
@@ -131,16 +130,6 @@ def register(request):
         form = CreateUserForm(request.POST)
         if form.is_valid():
             user = form.save()
-            print(user)
-
-            group = Group.objects.get(name="customer")
-            user.groups.add(group)
-            Customer.objects.create(
-                # create the customer name, username on form save
-                user=user,
-                name=user.username,
-                email=user.email,
-            )
             messages.success(
                 request, f"Success! Please Login as {form.cleaned_data.get('username')}"
             )
