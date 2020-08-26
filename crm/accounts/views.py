@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 
 from .decorators import unauthenticated_user, allowed_user, admin_only
 from .filters import OrderFilter
-from .forms import OrderForm, CreateUserForm
+from .forms import OrderForm, CreateUserForm, CustomerForm
 from .models import Product, Order, Customer
 
 
@@ -139,6 +139,7 @@ def register(request):
                 # create the customer name, username on form save
                 user=user,
                 name=user.username,
+                email=user.email,
             )
             messages.success(
                 request, f"Success! Please Login as {form.cleaned_data.get('username')}"
@@ -187,3 +188,18 @@ def user(request):
         "pending_orders": pending,
     }
     return render(request, "accounts/user.html", context)
+
+
+@login_required(login_url="login")
+@allowed_user(["customer"])
+def account_settings(request):
+    customer = request.user.customer
+    if request.method == 'POST':
+        form = CustomerForm(request.POST, request.FILES, instance=customer)
+        if form.is_valid():
+            form.save()
+            return redirect('account')
+    else:
+        form = CustomerForm(instance=customer)
+    context = {'form':form}
+    return render(request, "accounts/account_settings.html", context)
