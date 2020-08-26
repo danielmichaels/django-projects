@@ -131,9 +131,15 @@ def register(request):
         form = CreateUserForm(request.POST)
         if form.is_valid():
             user = form.save()
+            print(user)
 
-            group = Group.objects.get(name='customer')
+            group = Group.objects.get(name="customer")
             user.groups.add(group)
+            Customer.objects.create(
+                # create the customer name, username on form save
+                user=user,
+                name=user.username,
+            )
             messages.success(
                 request, f"Success! Please Login as {form.cleaned_data.get('username')}"
             )
@@ -143,6 +149,7 @@ def register(request):
 
     context = {"form": form}
     return render(request, "accounts/register.html", context)
+
 
 @unauthenticated_user
 def login_(request):
@@ -165,7 +172,18 @@ def logout_(request):
     logout(request)
     return redirect("home")
 
+
 @allowed_user(allowed_roles=["customer"])
 def user(request):
-    context = {}
-    return render(request, 'accounts/user.html', context)
+    orders = request.user.customer.order_set.all()
+    total_order = orders.count()
+    delivered = orders.filter(status="Delivered").count()
+    pending = orders.filter(status="Pending").count()
+
+    context = {
+        "orders": orders,
+        "total_orders": total_order,
+        "delivered_orders": delivered,
+        "pending_orders": pending,
+    }
+    return render(request, "accounts/user.html", context)

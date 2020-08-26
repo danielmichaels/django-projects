@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -7,6 +8,7 @@ class Customer(models.Model):
     """
 
     # Have to register models in the admin.py file as well
+    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, null=True)
     phone = models.CharField(max_length=255, null=True)
     email = models.EmailField(max_length=255, null=True)
