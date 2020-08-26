@@ -183,12 +183,12 @@ def user(request):
 @allowed_user(["customer"])
 def account_settings(request):
     customer = request.user.customer
-    if request.method == 'POST':
+    if request.method == "POST":
         form = CustomerForm(request.POST, request.FILES, instance=customer)
         if form.is_valid():
             form.save()
-            return redirect('account')
+            return redirect("account")
     else:
         form = CustomerForm(instance=customer)
-    context = {'form':form}
+    context = {"form": form}
     return render(request, "accounts/account_settings.html", context)
