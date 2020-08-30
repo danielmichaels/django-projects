@@ -30,7 +30,35 @@
             return cookieValue;
         }
 
+        function getCookie(name) {
+            // split cookie stirng and get all teh k=v in an array
+            let cookieArr = document.cookie.split(";");
+
+            for (let i = 0; i < cookieArr.length; i++) {
+                let cookiePair = cookieArr[i].split("=");
+
+                // remove whitespace and begin cookie and compare with `name`
+                if (name === cookiePair[0].trim()) {
+                    // Decode the cookie and return it
+                    return decodeURIComponent(cookiePair[1]);
+                }
+            }
+            // return null if found
+            return null;
+        }
+
+        let cart = JSON.parse(getCookie('cart'));
+        {#let cart = getToken('cart');#}
         const csrftoken = getToken('csrftoken');
+        if (cart === null) {
+            cart = {}
+            console.log('cart created')
+            document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+        }
+        console.log('cart=',cart)
+        console.log('csrf=',csrftoken)
+
+
     </script>
 </head>
 <body>

@@ -146,6 +146,8 @@
             }).then((data) => {
                 console.log('Success ', data)
                 alert('Transaction Complete')
+                {# clear the guest cart after transaction #}
+                document.cookie = 'cart={};domain=;path=/'
                 window.location.href = "{% url 'store' %}"
             })
         }
