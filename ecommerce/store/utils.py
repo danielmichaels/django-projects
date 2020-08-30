@@ -44,9 +44,10 @@ def cookie_cart(request):
     except:
         # if item gets deleted from db and user has in cart, will crash
         # so we catch the error and safely remove it from cart
-        print('except fired')
+        print("except fired")
         pass
-    return {'cart_items': cart_items, 'order': order, 'items': items}
+    return {"cart_items": cart_items, "order": order, "items": items}
+
 
 def cart_data(request):
     if request.user.is_authenticated:
@@ -59,7 +60,8 @@ def cart_data(request):
         cart_items = cookie_data["cart_items"]
         order = cookie_data["order"]
         items = cookie_data["items"]
-    return {'cart_items': cart_items, 'order': order, 'items': items}
+    return {"cart_items": cart_items, "order": order, "items": items}
+
 
 def guest_order(request, data):
 
@@ -83,4 +85,3 @@ def guest_order(request, data):
         )
 
     return customer, order
-
