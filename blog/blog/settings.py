@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # internal apps
-    "blog_content",
+    "blog_content.apps.BlogContentConfig",
     # third party apps
 ]
 
