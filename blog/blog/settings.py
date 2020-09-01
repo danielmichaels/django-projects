@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # internal apps
     "blog_content.apps.BlogContentConfig",
+    "users.apps.UsersConfig",
     # third party apps
 ]
 
