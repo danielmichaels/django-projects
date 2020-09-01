@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "blog_content.apps.BlogContentConfig",
     "users.apps.UsersConfig",
     # third party apps
+    "crispy_forms",
 ]
 
 MIDDLEWARE = [
@@ -116,3 +117,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = "/static/"
+
+# Crispy Forms
+CRISPY_TEMPLATE_PACK = "bootstrap4"
