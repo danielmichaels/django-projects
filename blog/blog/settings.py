@@ -118,6 +118,10 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
+# full path to dir where we store files
+MEDIA_ROOT = BASE_DIR / 'media'
+# public url of the dir
+MEDIA_URL = '/media/'
 # Crispy Forms
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 

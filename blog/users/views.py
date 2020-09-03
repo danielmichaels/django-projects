@@ -14,7 +14,9 @@ def register(request):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get("username")
-            messages.success(request, f"Sign Up Confirmed, Welcome {username}, Please Login")
+            messages.success(
+                request, f"Sign Up Confirmed, Welcome {username}, Please Login"
+            )
             return redirect("login")
     else:
         form = UserRegisterForm()
@@ -23,4 +25,7 @@ def register(request):
 
 @login_required
 def profile(request):
-    return render(request, 'users/profile.html')
+    """
+    Users profile page.
+    """
+    return render(request, "users/profile.html")
