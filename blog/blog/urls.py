@@ -26,6 +26,7 @@ urlpatterns = [
 urlpatterns += [
     path("", include("blog_content.urls")),
     # user auth
+    path("profile/", user_views.profile, name="profile"),
     path("register/", user_views.register, name="register"),
     path(
         "login/",
