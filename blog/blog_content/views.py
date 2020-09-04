@@ -22,6 +22,7 @@ class PostListView(ListView):
     template_name = "blog_content/home.html"  # else 'post_list.html'
     context_object_name = "posts"  # else it looks for 'object_list' instead of post
     ordering = ["-date_posted"]
+    paginate_by = 2
 
 
 class PostDetailView(DetailView):
