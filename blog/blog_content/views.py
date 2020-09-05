@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.shortcuts import render
+from django.contrib.auth.models import User
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import (
     ListView,
     DetailView,
@@ -22,7 +23,23 @@ class PostListView(ListView):
     template_name = "blog_content/home.html"  # else 'post_list.html'
     context_object_name = "posts"  # else it looks for 'object_list' instead of post
     ordering = ["-date_posted"]
-    paginate_by = 2
+    paginate_by = 5
+
+class UserPostListView(ListView):
+    """
+    CBV PostList of one Users posts
+
+    CBV templates: <app>/<model>_<viewtype>.html | 'blog_content/post_list.html
+    """
+
+    model = Post
+    template_name = "blog_content/user_posts.html"  # else 'post_list.html'
+    context_object_name = "posts"  # else it looks for 'object_list' instead of post
+    paginate_by = 5
+
+    def get_queryset(self):
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        return Post.objects.filter(author=user).order_by('-date_posted')
 
 
 class PostDetailView(DetailView):
