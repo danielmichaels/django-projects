@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # NOTE: will conflict with things like whitenoise,
+    # so ensure its placed above them
     "channels",
     "chats",
 ]
